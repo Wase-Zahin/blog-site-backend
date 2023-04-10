@@ -67,4 +67,4 @@ def detail():
             return res
     return "Sorry the content is not available"
 
-app.run(debug=True, port=8000)
+app.run(debug=False, port=8000)
