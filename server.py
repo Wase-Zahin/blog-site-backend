@@ -1,9 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
-from gevent.pywsgi import WSGIServer
-from gevent import monkey
-from flask_compress import Compress
 from threading import Lock
 
 conn = sqlite3.connect("cms.db", check_same_thread=False)
@@ -21,7 +18,6 @@ lock = Lock()
 app = Flask(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-print(app)
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
@@ -71,8 +67,4 @@ def detail():
             return res
     return "Sorry the content is not available"
 
-http_server = WSGIServer(('0.0.0.0', 8080), app)
-http_server.serve_forever()
-monkey.patch_all()
-compress = Compress()
-compress.init_app(app)
+app.run(debug=True, port=8000)
