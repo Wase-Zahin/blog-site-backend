@@ -1,10 +1,19 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, g
 from flask_cors import CORS
 import sqlite3
 from threading import Lock
+from gevent.pywsgi import WSGIServer
+from gevent import monkey
+from flask_compress import Compress
+
+monkey.patch_all()
+
 
 app = Flask(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
+
+compress = Compress()
+compress.init_app(app)
 
 lock = Lock()
 
@@ -32,6 +41,10 @@ def home():
             if res:
                 return jsonify(res)
     return jsonify()
+
+@app.route('/')
+def index():
+  return render_template("index.html")
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -78,4 +91,5 @@ def detail():
     return "Sorry the content is not available"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    http_server = WSGIServer(('0.0.0.0', 8080), app)
+    http_server.serve_forever()
